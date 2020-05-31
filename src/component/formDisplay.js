@@ -136,7 +136,8 @@ class FormItem extends React.Component {
             message: 'Please input your username!',
           },
         ]}
-      ><InputNumber min={1} max={10} /></Form.Item>);
+      ><InputNumber formatter={value => `${value}`.replace(/[^.\d]/g,'') }
+      parser={value => value}/></Form.Item>);
     } else if (this.props.description.type === "Date") {
       inputBox = (<Form.Item
         label={this.props.description.title}
