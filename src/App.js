@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import { FormClass } from './component/formDisplay.js';
 import { LoadMoreList } from './component/formsList.js';
+import { NotFound } from './component/notFound.js';
 import { Layout, Menu } from 'antd';
 import {
   BrowserRouter as Router,
@@ -26,6 +27,7 @@ function App() {
           </Route>
           <Route path='/form/:handle' component={FormClass}>
           </Route>
+          <Route path='*' exact={true} component={NotFound} />
         </Switch></div>
       </Content>
       <Footer style={{ textAlign: 'center' }}>create dynamic forms</Footer>

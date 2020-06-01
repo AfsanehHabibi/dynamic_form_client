@@ -1,6 +1,8 @@
 import React from 'react';
 import 'antd/dist/antd.css';
 import { Form, Input, Button, InputNumber, DatePicker, Select } from 'antd';
+import {NotFound} from './notFound';
+import { Space,Spin, Alert } from 'antd';
 import { SimpleMap } from './map.js';
 const axios = require('axios').default;
 const { Option } = Select;
@@ -22,18 +24,9 @@ export class FormClass extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      formDescriptor: {
-        "title": "mohammad",
-        "id": "2",
-        "fields": [
-          {
-            "name": "Favorite_Name",
-            "title": "Favorite_Name",
-            "type": "Text",
-            "required": false
-          }
-        ]
-      }
+      loading : true,
+      formDescriptor: {},
+      loadNotFound : false
     };
   }
   componentDidMount() {
@@ -43,9 +36,18 @@ export class FormClass extends React.Component {
       .then(res => {
         console.debug("res.data");
         this.setState({
+          loading :false,
           formDescriptor: res.data
         });
       })
+      .catch((e) => 
+      {
+        this.setState({
+          loading :false,
+          loadNotFound :true
+        });
+        console.error(e);
+      });
   }
   onFinish = values => {
     console.debug(values)
@@ -68,26 +70,39 @@ export class FormClass extends React.Component {
     console.log('Failed:', errorInfo);
   };
   render() {
+    let output;
+    if(this.state.loading){
+      output=(<div><Spin tip="Loading..." size="large"/></div>);
+      console.debug("first")
+    }else if(this.state.loadNotFound){
+      output= (<NotFound/>);
+    }
+    else{
+      output=(<div><Form
+      {...layout}
+      name="basic"
+      initialValues={{
+        remember: true,
+      }}
+      onFinish={this.onFinish}
+      onFinishFailed={this.onFinishFailed}
+    >
+      {this.state.formDescriptor.fields.map((answer, i) => {
+        // Return the element. Also pass key     
+        return (<FormItem description={answer} />)
+      })}
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit">
+          Submit
+      </Button>
+      </Form.Item>
+    </Form></div>);
+          console.debug("first")
+    }
     return (
-      <Form
-        {...layout}
-        name="basic"
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={this.onFinish}
-        onFinishFailed={this.onFinishFailed}
-      >
-        {this.state.formDescriptor.fields.map((answer, i) => {
-          // Return the element. Also pass key     
-          return (<FormItem description={answer} />)
-        })}
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
-            Submit
-        </Button>
-        </Form.Item>
-      </Form>
+      <div>
+      {output}
+    </div>
     );
   }
 }
