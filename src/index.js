@@ -3,10 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { ConfigProvider } from 'antd';
+import faIR from 'antd/es/locale/fa_IR';
+
 
 ReactDOM.render(
   <React.StrictMode>
+    <ConfigProvider locale={faIR}>
     <App />
+  </ConfigProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
