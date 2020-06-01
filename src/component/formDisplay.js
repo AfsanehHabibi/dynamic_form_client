@@ -48,6 +48,14 @@ export class FormClass extends React.Component {
       })
   }
   onFinish = values => {
+    console.debug(values)
+    this.state.formDescriptor.fields.forEach(element => {
+      if(element.options){
+        values[element.name] =JSON.parse(values[element.name]);
+      }else if(element.type === "Location"){
+        values[element.name].value = JSON.parse(values[element.name].value);
+      }
+    }); 
     console.debug('Success:', values);
     axios.post(`http://localhost:${process.env.REACT_APP_BACKEND_PORT}/api/forms/${this.state.formDescriptor.id}`, { values })
       .then(res => {
@@ -115,7 +123,7 @@ class FormItem extends React.Component {
         ]}
       ><Input /></Form.Item>);
     } else if (this.props.description.type === "Location") {
-      inputBox = <Form.Item name="value"
+      inputBox = <Form.Item name={this.props.description.name}
         label={this.props.description.title}
         rules={[
           {

@@ -37,7 +37,7 @@ export class SimpleMap extends Component {
     /* this.props.onCenterChange([childProps.lat, childProps.lng]);
     console.debug([childProps.lat, childProps.lng]) */
     console.debug("clicked1")
-    this.handleChange(`lat:${lat},lng:${lng}`);
+    this.handleChange(`{"lat":"${lat}","long":"${lng}"}`);
   }
 
   render() {
