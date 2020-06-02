@@ -1,25 +1,39 @@
 import React, { Component } from 'react';
 import GoogleMapReact from 'google-map-react';
 
-const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
 export class SimpleMap extends Component {
   constructor(props) {
     super(props);
     const value = props.value || {};
     this.state = {
-      // Same name as valuePropName in getFieldDecorator ('value' is default):
-      // https://ant.design/components/form/?locale=en-US#getFieldDecorator(id,-options)-parameters
       value,
+      latestLat: 35.697736,
+      latestLng: 51.386228
       // ...
     };
   }
+  componentDidMount() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(((position) => {
+        this.setState({
+          center: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          },
+          latestLat: position.coords.latitude,
+          latestLng: position.coords.latitude
+        });
+        console.debug(this.state.center)
+      }));
+    } else {
 
+    }
+  }
   handleChange = (value) => {
     this.setState({ value });
     const { onChange } = this.props;
     if (onChange) {
-      // This will provide the form with changes
       onChange({ ...this.state, ...{ value } });
     }
   }
@@ -34,9 +48,11 @@ export class SimpleMap extends Component {
 
   _onClick = ({ x, y, lat, lng, event }) => {
     console.debug(x, y, lat, lng)
-    /* this.props.onCenterChange([childProps.lat, childProps.lng]);
-    console.debug([childProps.lat, childProps.lng]) */
     console.debug("clicked1")
+    this.setState({
+      latestLat: lat,
+      latestLng: lng
+    })
     this.handleChange(`{"lat":"${lat}","long":"${lng}"}`);
   }
 
@@ -47,15 +63,20 @@ export class SimpleMap extends Component {
         <GoogleMapReact
           bootstrapURLKeys={{ key: process.env.REACT_APP_MAP_API_KEY/* YOUR KEY HERE */ }}
           defaultCenter={this.props.center}
+          center={this.state.center}
           defaultZoom={this.props.zoom}
           onClick={this._onClick}
+          // this is a temporary fixation for a bug in google-map-react there is a ongoing
+          // issue pool for this https://github.com/google-map-react/google-map-react/pull/873
+          // change this part of code if package fixed issue
+          distanceToMouse={() => { }}
+          //
         >
-
-          {/* <AnyReactComponent
-            lat= {35.697736}
-            lng= {51.386228}
-            text="My Marker"
-          />  */}
+          <Marker
+            lat={this.state.latestLat}
+            lng={this.state.latestLng}
+            text='here'
+          />
         </GoogleMapReact>
       </div>
     );
@@ -63,5 +84,10 @@ export class SimpleMap extends Component {
 }
 
 class Marker extends React.Component {
+  render() {
+    return (
+      <div>{this.props.text}</div>
+    );
+  }
 
 }
