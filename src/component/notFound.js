@@ -1,5 +1,4 @@
 import React from 'react';
-import { Empty } from 'antd';
 import Image from './../images/not_found.jpg';
 export class NotFound extends React.Component {
     render() {
