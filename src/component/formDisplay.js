@@ -1,8 +1,8 @@
 import React from 'react';
 import 'antd/dist/antd.css';
 import { Form, Input, Button, InputNumber, DatePicker, Select } from 'antd';
-import {NotFound} from './notFound';
-import { Space,Spin, Alert } from 'antd';
+import { NotFound } from './notFound';
+import { Spin, Alert, message } from 'antd';
 import { SimpleMap } from './map.js';
 const axios = require('axios').default;
 const { Option } = Select;
@@ -24,45 +24,59 @@ export class FormClass extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading : true,
+      loading: true,
       formDescriptor: {},
-      loadNotFound : false
+      loadNotFound: false,
+      submisionState: 'none'
     };
   }
   componentDidMount() {
-    console.debug("wahts happentin");
     const { handle } = this.props.match.params
     axios.get(`http://localhost:${process.env.REACT_APP_BACKEND_PORT}/api/forms/${handle}`)
       .then(res => {
-        console.debug("res.data");
         this.setState({
-          loading :false,
+          loading: false,
           formDescriptor: res.data
         });
       })
-      .catch((e) => 
-      {
+      .catch((e) => {
         this.setState({
-          loading :false,
-          loadNotFound :true
+          loading: false,
+          loadNotFound: true
         });
         console.error(e);
       });
   }
+  informUser = () => {
+    message
+      .loading('Action in progress..', 2.5)
+      .then(() => {
+        if (!this.state.loading) {
+          if (this.state.submisionState === 'successful') {
+            message.success('form submitted', 2.5)
+          } else {
+            message.error('something went wrong', 2.5)
+          }
+        }
+      })
+  };
   onFinish = values => {
-    console.debug(values)
     this.state.formDescriptor.fields.forEach(element => {
-      if(element.options){
-        values[element.name] =JSON.parse(values[element.name]);
-      }else if(element.type === "Location"){
-        values[element.name].value = JSON.parse(values[element.name].value);
+      if (element.options) {
+        if (values[element.name] !== undefined) {
+          values[element.name] = JSON.parse(values[element.name]);
+        }
+      } else if (element.type === "Location") {
+        if (values[element.name] !== undefined)
+          values[element.name].value = JSON.parse(values[element.name].value);
       }
-    }); 
-    console.debug('Success:', values);
+    });
     axios.post(`http://localhost:${process.env.REACT_APP_BACKEND_PORT}/api/forms/${this.state.formDescriptor.id}`, { values })
       .then(res => {
-        console.debug("res");
-        console.debug(res);
+        this.setState({
+          submisionState: 'successful'
+        })
+        this.informUser();
       })
   };
 
@@ -71,38 +85,45 @@ export class FormClass extends React.Component {
   };
   render() {
     let output;
-    if(this.state.loading){
-      output=(<div><Spin tip="Loading..." size="large"/></div>);
-      console.debug("first")
-    }else if(this.state.loadNotFound){
-      output= (<NotFound/>);
+    if (this.state.loading) {
+      output = (<div><Spin tip="Loading..." size="large" /></div>);
+    } else if (this.state.loadNotFound) {
+      output = (<NotFound />);
     }
-    else{
-      output=(<div><Form
-      {...layout}
-      name="basic"
-      initialValues={{
-        remember: true,
-      }}
-      onFinish={this.onFinish}
-      onFinishFailed={this.onFinishFailed}
-    >
-      {this.state.formDescriptor.fields.map((answer, i) => {
-        // Return the element. Also pass key     
-        return (<FormItem description={answer} />)
-      })}
-      <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Submit
+    else {
+      if (!this.state.formDescriptor.fields) {
+        output = (<Alert
+          message="Error"
+          description="Form has no item to fill"
+          type="error"
+          showIcon
+        />)
+      }
+      else {
+        output = (<div><Form
+          {...layout}
+          name="basic"
+          initialValues={{
+            remember: true,
+          }}
+          onFinish={this.onFinish}
+          onFinishFailed={this.onFinishFailed}
+        >
+          {this.state.formDescriptor.fields.map((answer, i) => {
+            return (<FormItem description={answer} />)
+          })}
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit">
+              Submit
       </Button>
-      </Form.Item>
-    </Form></div>);
-          console.debug("first")
+          </Form.Item>
+        </Form></div>);
+      }
     }
     return (
       <div>
-      {output}
-    </div>
+        {output}
+      </div>
     );
   }
 }
@@ -122,7 +143,6 @@ class FormItem extends React.Component {
         ]}
       ><Select placeholder="Select option">
           {this.props.description.options.map((answer, i) => {
-            // Return the element. Also pass key     
             return (<Option value={JSON.stringify(answer.value)}>{answer.label}</Option>)
           })}
         </Select></Form.Item>);
@@ -159,8 +179,8 @@ class FormItem extends React.Component {
             message: 'Please input a number!',
           },
         ]}
-      ><InputNumber formatter={value => `${value}`.replace(/[^.\d]/g,'') }
-      parser={value => value}/></Form.Item>);
+      ><InputNumber formatter={value => `${value}`.replace(/[^.\d]/g, '')}
+        parser={value => value} /></Form.Item>);
     } else if (this.props.description.type === "Date") {
       inputBox = (<Form.Item
         label={this.props.description.title}
