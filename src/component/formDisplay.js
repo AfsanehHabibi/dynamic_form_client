@@ -117,7 +117,7 @@ class FormItem extends React.Component {
         rules={[
           {
             required: this.props.description.required,
-            message: 'Please input your username!',
+            message: 'Please choose on option!',
           },
         ]}
       ><Select placeholder="Select option">
@@ -133,7 +133,7 @@ class FormItem extends React.Component {
         rules={[
           {
             required: this.props.description.required,
-            message: 'Please input your username!',
+            message: 'Please fill the input!',
           },
         ]}
       ><Input /></Form.Item>);
@@ -143,7 +143,7 @@ class FormItem extends React.Component {
         rules={[
           {
             required: this.props.description.required,
-            message: 'Please input your username!',
+            message: 'Please choose a location!',
           },
         ]}
       >
@@ -156,7 +156,7 @@ class FormItem extends React.Component {
         rules={[
           {
             required: this.props.description.required,
-            message: 'Please input your username!',
+            message: 'Please input a number!',
           },
         ]}
       ><InputNumber formatter={value => `${value}`.replace(/[^.\d]/g,'') }
@@ -168,7 +168,7 @@ class FormItem extends React.Component {
         rules={[
           {
             required: this.props.description.required,
-            message: 'Please input your username!',
+            message: 'Please pick a date!',
           },
         ]}
       ><DatePicker /></Form.Item>);
