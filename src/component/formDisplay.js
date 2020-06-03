@@ -32,7 +32,7 @@ export class FormClass extends React.Component {
   }
   componentDidMount() {
     const { handle } = this.props.match.params
-    axios.get(`http://localhost:${process.env.REACT_APP_BACKEND_PORT}/api/forms/${handle}`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/forms/${handle}`)
       .then(res => {
         this.setState({
           loading: false,
@@ -71,12 +71,19 @@ export class FormClass extends React.Component {
           values[element.name].value = JSON.parse(values[element.name].value);
       }
     });
-    axios.post(`http://localhost:${process.env.REACT_APP_BACKEND_PORT}/api/forms/${this.state.formDescriptor.id}`, { values })
+    this.informUser();
+    axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/forms/${this.state.formDescriptor.id}`, { values })
       .then(res => {
         this.setState({
           submisionState: 'successful'
         })
-        this.informUser();
+        
+      })
+      .catch(res => {
+        this.setState({
+          submisionState: 'error'
+        })
+        
       })
   };
 

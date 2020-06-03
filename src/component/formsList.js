@@ -5,8 +5,7 @@ import {Link} from 'react-router-dom';
 
 const axios = require('axios').default;
 const count = 3;
-const fakeDataUrl =`http://localhost:${process.env.REACT_APP_BACKEND_PORT}/api/forms`;// `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
-
+const fakeDataUrl =`${process.env.REACT_APP_BACKEND_URL}/api/forms`;
 export class LoadMoreList extends React.Component {
   state = {
     initLoading: true,
@@ -94,7 +93,9 @@ export class LoadMoreList extends React.Component {
             lineHeight: '32px',
           }}
         >
-          <Button onClick={this.onLoadMore}>loading more</Button>
+          <Button 
+          //onClick={this.onLoadMore}
+          >loading more</Button>
         </div>
       ) : null;
 
